@@ -1,47 +1,39 @@
 #include "shell.h"
 
 /**
- * trim_whitespace - Strip leading and trailing spaces and tabs.
- * @str: String to trim (trailing whitespace is modified in place).
+ * tokenize - Split a line into tokens separated by whitespace.
+ * @line: The input string (modified in place by strtok).
+ * @argv: Output array to fill with token pointers.
+ * @max: Size of the argv array.
  *
- * Return: Pointer to the first non-whitespace character. Returns an
- * empty string if the entire input was whitespace.
+ * Return: Number of tokens parsed (excluding the NULL terminator).
  */
-char *trim_whitespace(char *str)
+int tokenize(char *line, char **argv, int max)
 {
-	char *end;
+	int count = 0;
+	char *token;
 
-	while (*str == ' ' || *str == '\t')
-		str++;
-
-	if (*str == '\0')
-		return (str);
-
-	end = str + strlen(str) - 1;
-	while (end > str && (*end == ' ' || *end == '\t'))
+	token = strtok(line, " \t");
+	while (token != NULL && count < max - 1)
 	{
-		*end = '\0';
-		end--;
+		argv[count] = token;
+		count++;
+		token = strtok(NULL, " \t");
 	}
-
-	return (str);
+	argv[count] = NULL;
+	return (count);
 }
 
 /**
- * execute_command - Forks a child process and runs the given command
- *                   via execve. Parent waits for child to finish.
- * @command: Full path of the executable (e.g. "/bin/ls").
+ * execute_command - Forks a child process and runs a command via execve.
+ * @argv: NULL-terminated array of arguments (argv[0] is the command).
  *
  * Return: Nothing.
  */
-void execute_command(char *command)
+void execute_command(char **argv)
 {
 	pid_t pid;
 	int status;
-	char *argv[2];
-
-	argv[0] = command;
-	argv[1] = NULL;
 
 	pid = fork();
 	if (pid == -1)
@@ -67,18 +59,18 @@ void execute_command(char *command)
 /**
  * main - Entry point for the simple shell.
  *
- * Description: Prints a prompt, reads one command per line from stdin,
- * trims surrounding whitespace, and executes each via fork + execve.
- * Exits on EOF (Ctrl+D).
+ * Description: Prints a prompt, reads one line per command, tokenizes
+ * by whitespace, and executes via fork + execve. Exits on EOF.
  *
  * Return: 0 on normal exit.
  */
 int main(void)
 {
 	char *line = NULL;
-	char *trimmed;
+	char *argv[64];
 	size_t cap = 0;
 	ssize_t nread;
+	int n;
 
 	while (1)
 	{
@@ -96,12 +88,11 @@ int main(void)
 		if (line[nread - 1] == '\n')
 			line[nread - 1] = '\0';
 
-		trimmed = trim_whitespace(line);
-
-		if (trimmed[0] == '\0')
+		n = tokenize(line, argv, 64);
+		if (n == 0)
 			continue;
 
-		execute_command(trimmed);
+		execute_command(argv);
 	}
 
 	free(line);

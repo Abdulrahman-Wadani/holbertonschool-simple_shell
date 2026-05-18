@@ -10,7 +10,7 @@
 
 extern char **environ;
 
-void execute_command(char *command);
-char *trim_whitespace(char *str);
+int tokenize(char *line, char **argv, int max);
+void execute_command(char **argv);
 
 #endif /* SHELL_H */
