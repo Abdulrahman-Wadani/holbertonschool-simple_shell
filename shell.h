@@ -7,10 +7,10 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <errno.h>
 
 extern char **environ;
 
 void execute_command(char *command);
+char *trim_whitespace(char *str);
 
 #endif /* SHELL_H */
