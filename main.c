@@ -28,7 +28,7 @@ int main(void)
 			if (strcmp(strArr[0], "exit") == 0)
 			{
 				free(buffer);
-				exit(EXIT_SUCCESS);
+				exit(last_status);
 			}
 			last_status = command_existence(strArr);
 		}
