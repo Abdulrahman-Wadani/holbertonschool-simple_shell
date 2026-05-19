@@ -13,7 +13,8 @@ int main(void)
 
 	while (1)
 	{
-		printf("$ ");
+		if (isatty(STDIN_FILENO))
+			printf("$ ");
 		fflush(stdout);
 		chars_read = getline(&buffer, &buf_size, stdin);
 		if (!buffer || chars_read == -1)
