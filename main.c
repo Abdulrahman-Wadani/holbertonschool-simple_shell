@@ -30,6 +30,12 @@ int main(void)
 				free(buffer);
 				exit(last_status);
 			}
+			if (strcmp(strArr[0], "env") == 0)
+			{
+				print_env();
+				last_status = 0;
+				continue;
+			}
 			last_status = command_existence(strArr);
 		}
 	}
