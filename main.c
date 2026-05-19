@@ -1,9 +1,9 @@
 #include "shell.h"
 
 /**
- * main - description
+ * main - Entry point of the shell program
  *
- * Return: Return: 0 on success
+ * Return: 0 on success
  */
 int main(void)
 {
@@ -20,13 +20,20 @@ int main(void)
 		if (!buffer || chars_read == -1)
 			break;
 		tokenize_string(buffer, strArr);
-		if (strcmp(strArr[0], "exit") == 0)
-			exit(EXIT_SUCCESS);
-		command_existence(strArr);
+		if (strArr[0])
+		{
+			if (strcmp(strArr[0], "exit") == 0)
+			{
+				free(buffer);
+				exit(EXIT_SUCCESS);
+			}
+			command_existence(strArr);
+		}
 	}
 	if (buffer)
 		free(buffer);
-	printf("\n");
+	if (isatty(STDIN_FILENO))
+		printf("\n");
 	return (0);
 
 }
