@@ -23,10 +23,10 @@ void tokenize_string(char *str, char *strArr[])
 }
 
 /**
- * execute_command - executes a command
+ * execute_command - executes a command using execve
  * @strArr: array of command arguments
  *
- * Return: void
+ * Return: exit status of the executed command
  */
 int execute_command(char *strArr[])
 {
@@ -38,12 +38,12 @@ int execute_command(char *strArr[])
 	{
 		if (execve(strArr[0], strArr, NULL) == -1)
 		{
-			fprintf(stderr, "Errer\n");
+			fprintf(stderr, "./hsh: 1: %s: not found\n", strArr[0]);
 			exit(127);
 		}
 	}
 	else if (id == -1)
-		fprintf(stderr, "Fork failed\n");
+		fprintf(stderr, "./hsh: 1: %s: not found\n", strArr[0]);
 	else
 	{
 		wait(&status);
@@ -121,7 +121,7 @@ char *get_command_path(char *command)
  * command_existence - checks whether a command exists and executes it
  * @strArr: array of command arguments
  *
- * Return: void
+ * Return: exit status of the command, or 127 if command not found
  */
 int command_existence(char *strArr[])
 {
@@ -137,7 +137,7 @@ int command_existence(char *strArr[])
 		}
 		else
 		{
-			fprintf(stderr, "command not found\n");
+			fprintf(stderr, "./hsh: 1: %s: not found\n", strArr[0]);
 			return (127);
 		}
 	}
@@ -149,7 +149,7 @@ int command_existence(char *strArr[])
 		free(full_path);
 		return (status);
 	}
-	fprintf(stderr, "command not found\n");
+	fprintf(stderr, "./hsh: 1: %s: not found\n", strArr[0]);
 	return (127);
 
 }
