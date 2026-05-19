@@ -28,24 +28,29 @@ void tokenize_string(char *str, char *strArr[])
  *
  * Return: void
  */
-void execute_command(char *strArr[])
+int execute_command(char *strArr[])
 {
 	pid_t id;
-
+	int status = 0;
 
 	id = fork();
 	if (id == 0)
 	{
 		if (execve(strArr[0], strArr, NULL) == -1)
 		{
-			printf("command not found\n");
-			exit(EXIT_FAILURE);
+			fprintf(stderr, "Errer\n");
+			exit(127);
 		}
 	}
 	else if (id == -1)
-		printf("Fork failed\n");
+		fprintf(stderr, "Fork failed\n");
 	else
-		wait(NULL);
+	{
+		wait(&status);
+		if (WIFEXITED(status))
+			return (WEXITSTATUS(status));
+	}
+	return (0);
 }
 
 
@@ -118,31 +123,33 @@ char *get_command_path(char *command)
  *
  * Return: void
  */
-void command_existence(char *strArr[])
+int command_existence(char *strArr[])
 {
 	char *slash_ptr = strchr(strArr[0], '/'), *full_path;
 	struct stat st;
+	int status = 0;
 
 	if (slash_ptr)
 	{
 		if (stat(strArr[0], &st) == 0)
 		{
-			execute_command(strArr);
-			return;
+			return (execute_command(strArr));
 		}
 		else
 		{
-			printf("command not found\n");
-			return;
+			fprintf(stderr, "command not found\n");
+			return (127);
 		}
 	}
 	full_path = get_command_path(strArr[0]);
 	if (full_path)
 	{
 		strArr[0] = full_path;
-		execute_command(strArr);
+		status = execute_command(strArr);
 		free(full_path);
-		return;
+		return (status);
 	}
-	printf("command not found\n");
+	fprintf(stderr, "command not found\n");
+	return (127);
+
 }
