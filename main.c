@@ -19,7 +19,7 @@ int main(void)
 		if (!buffer || chars_read == -1)
 			break;
 		tokenize_string(buffer, strArr);
-		if (strArr[0] == "exit")
+		if (strcmp(strArr[0], "exit") == 0)
 			exit(EXIT_SUCCESS);
 		command_existence(strArr);
 	}
