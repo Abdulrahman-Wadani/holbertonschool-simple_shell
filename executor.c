@@ -90,13 +90,13 @@ char *get_command_path(char *command)
 	token = strtok(copy_path, ":");
 	while (token)
 	{
-		command_path = calloc(strlen(token) + strlen(command) + 2, 1);
+		command_path = malloc(strlen(token) + strlen(command) + 2);
 		if (!command_path)
 		{
 			free(copy_path);
 			return (NULL);
 		}
-		strcat(command_path, token);
+		strcpy(command_path, token);
 		strcat(command_path, "/");
 		strcat(command_path, command);
 		if (stat(command_path, &st) == 0)
