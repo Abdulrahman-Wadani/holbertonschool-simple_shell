@@ -1,0 +1,144 @@
+.TH SIMPLE_SHELL 1 "May 2026" "Simple Shell 1.0" "User Commands"
+.SH NAME
+simple_shell \- a simple UNIX command line interpreter
+.SH SYNOPSIS
+.B ./simple_shell
+.SH DESCRIPTION
+.B simple_shell
+is a minimal UNIX command line interpreter written in C. It reads commands
+from standard input, parses them, and executes them in a child process using
+.BR execve (2).
+It replicates the most essential features of
+.BR sh (1).
+.PP
+When invoked without arguments,
+.B simple_shell
+runs in interactive mode: it prints the prompt
+.B "$ " ,
+waits for a command, executes it, and repeats until end-of-file
+.RB ( Ctrl+D )
+or the
+.B exit
+built-in is entered.
+.PP
+When standard input is not a terminal,
+.B simple_shell
+runs in non-interactive mode: it reads commands from the input stream,
+executes them silently, and exits when input is exhausted.
+.SH INVOCATION
+Commands are read one line at a time. Each line is split into tokens
+delimited by whitespace. The first token is the command; the remaining
+tokens are passed as arguments. Empty lines and lines containing only
+whitespace are ignored.
+.SH COMMAND EXECUTION
+If the command name contains a slash, it is treated as a path and executed
+directly.
+.PP
+Otherwise,
+.B simple_shell
+searches for the executable in each directory listed in the
+.B PATH
+environment variable, in order. The first matching executable file is run.
+If no match is found, an error is printed and
+.BR fork (2)
+is not called.
+.PP
+A new process is created with
+.BR fork (2),
+and the command is executed in the child with
+.BR execve (2).
+The parent waits for the child to terminate before printing the prompt again.
+.SH BUILT-IN COMMANDS
+.TP
+.B exit
+Exits the shell. No arguments are accepted.
+.TP
+.B env
+Prints the current environment, one variable per line, in the form
+.IR VARIABLE=value .
+.SH ENVIRONMENT
+.B simple_shell
+inherits the environment from its parent process. The following variable
+affects its behavior:
+.TP
+.B PATH
+A colon-separated list of directories searched for executable commands.
+.SH EXIT STATUS
+.B simple_shell
+returns the exit status of the last executed command. If a command is not
+found, the exit status is
+.BR 127 .
+On
+.B exit
+or end-of-file, the shell returns
+.B 0
+unless an earlier command failed.
+.SH ERRORS
+If a command cannot be found,
+.B simple_shell
+prints a message of the form:
+.PP
+.RS
+./simple_shell: 1: command: not found
+.RE
+.PP
+to standard error and continues to the next prompt.
+.SH EXAMPLES
+Interactive use:
+.PP
+.RS
+.nf
+$ ./simple_shell
+$ /bin/ls
+AUTHORS  README.md  simple_shell
+$ ls
+AUTHORS  README.md  simple_shell
+$ env
+PATH=/usr/local/bin:/usr/bin:/bin
+HOME=/home/user
+$ exit
+$
+.fi
+.RE
+.PP
+Non-interactive use:
+.PP
+.RS
+.nf
+$ echo "/bin/ls" | ./simple_shell
+AUTHORS  README.md  simple_shell
+.fi
+.RE
+.SH LIMITATIONS
+.IP \(bu 2
+No support for pipes
+.RB ( | ),
+redirections
+.RB ( > ", " < ),
+or semicolons
+.RB ( ; ).
+.IP \(bu 2
+No support for variable expansion or quoting.
+.IP \(bu 2
+No support for command history or line editing.
+.IP \(bu 2
+No support for job control or background execution
+.RB ( & ).
+.IP \(bu 2
+Aliases, functions, and shell scripts are not supported.
+.SH BUGS
+None known at this time. Report issues to the authors listed in the
+.B AUTHORS
+file.
+.SH SEE ALSO
+.BR sh (1),
+.BR bash (1),
+.BR execve (2),
+.BR fork (2),
+.BR wait (2),
+.BR getline (3),
+.BR environ (7)
+.SH AUTHORS
+See the
+.B AUTHORS
+file in the project repository.
