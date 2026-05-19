@@ -3,13 +3,16 @@
 /**
  * main - Entry point of the shell program
  *
- * Return: 0 on success
+ * Reads and executes commands until end-of-file or exit.
+ *
+ * Return: last executed command status, or 0 if none.
  */
 int main(void)
 {
 	char *buffer = NULL, *strArr[64];
 	size_t buf_size = 0;
 	ssize_t chars_read;
+	int last_status = 0;
 
 	while (1)
 	{
@@ -27,13 +30,13 @@ int main(void)
 				free(buffer);
 				exit(EXIT_SUCCESS);
 			}
-			command_existence(strArr);
+			last_status = command_existence(strArr);
 		}
 	}
 	if (buffer)
 		free(buffer);
 	if (isatty(STDIN_FILENO))
 		printf("\n");
-	return (0);
+	return (last_status);
 
 }
