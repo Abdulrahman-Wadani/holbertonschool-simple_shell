@@ -9,10 +9,10 @@
 #include <sys/stat.h>
 extern char **environ;
 
-void command_existence(char *strArr[]);
+int command_existence(char *strArr[]);
 char *get_command_path(char *command);
 char *get_path(void);
-void execute_command(char *strArr[]);
+int execute_command(char *strArr[]);
 void tokenize_string(char *str, char *strArr[]);
 
 
