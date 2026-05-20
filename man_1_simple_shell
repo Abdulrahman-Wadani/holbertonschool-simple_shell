@@ -1,10 +1,10 @@
-.TH SIMPLE_SHELL 1 "May 2026" "Simple Shell 1.0" "User Commands"
+.TH HSH 1 "May 2026" "Simple Shell 1.0" "User Commands"
 .SH NAME
-simple_shell \- a simple UNIX command line interpreter
+hsh \- a simple UNIX command line interpreter
 .SH SYNOPSIS
-.B ./simple_shell
+.B ./hsh
 .SH DESCRIPTION
-.B simple_shell
+.B hsh
 is a minimal UNIX command line interpreter written in C. It reads commands
 from standard input, parses them, and executes them in a child process using
 .BR execve (2).
@@ -12,7 +12,7 @@ It replicates the most essential features of
 .BR sh (1).
 .PP
 When invoked without arguments,
-.B simple_shell
+.B hsh
 runs in interactive mode: it prints the prompt
 .B "$ " ,
 waits for a command, executes it, and repeats until end-of-file
@@ -22,7 +22,7 @@ or the
 built-in is entered.
 .PP
 When standard input is not a terminal,
-.B simple_shell
+.B hsh
 runs in non-interactive mode: it reads commands from the input stream,
 executes them silently, and exits when input is exhausted.
 .SH INVOCATION
@@ -35,7 +35,7 @@ If the command name contains a slash, it is treated as a path and executed
 directly.
 .PP
 Otherwise,
-.B simple_shell
+.B hsh
 searches for the executable in each directory listed in the
 .B PATH
 environment variable, in order. The first matching executable file is run.
@@ -57,14 +57,14 @@ Exits the shell. No arguments are accepted.
 Prints the current environment, one variable per line, in the form
 .IR VARIABLE=value .
 .SH ENVIRONMENT
-.B simple_shell
+.B hsh
 inherits the environment from its parent process. The following variable
 affects its behavior:
 .TP
 .B PATH
 A colon-separated list of directories searched for executable commands.
 .SH EXIT STATUS
-.B simple_shell
+.B hsh
 returns the exit status of the last executed command. If a command is not
 found, the exit status is
 .BR 127 .
@@ -75,11 +75,11 @@ or end-of-file, the shell returns
 unless an earlier command failed.
 .SH ERRORS
 If a command cannot be found,
-.B simple_shell
+.B hsh
 prints a message of the form:
 .PP
 .RS
-./simple_shell: 1: command: not found
+./hsh: 1: command: not found
 .RE
 .PP
 to standard error and continues to the next prompt.
@@ -88,11 +88,11 @@ Interactive use:
 .PP
 .RS
 .nf
-$ ./simple_shell
+$ ./hsh
 $ /bin/ls
-AUTHORS  README.md  simple_shell
+AUTHORS README.md hsh
 $ ls
-AUTHORS  README.md  simple_shell
+AUTHORS README.md hsh
 $ env
 PATH=/usr/local/bin:/usr/bin:/bin
 HOME=/home/user
@@ -105,8 +105,8 @@ Non-interactive use:
 .PP
 .RS
 .nf
-$ echo "/bin/ls" | ./simple_shell
-AUTHORS  README.md  simple_shell
+$ echo "/bin/ls" | ./hsh
+AUTHORS README.md hsh
 .fi
 .RE
 .SH LIMITATIONS
@@ -127,7 +127,11 @@ No support for job control or background execution
 .IP \(bu 2
 Aliases, functions, and shell scripts are not supported.
 .SH BUGS
-None known at this time. Report issues to the authors listed in the
+This shell intentionally implements only a small subset of POSIX sh
+behavior. See the
+.B LIMITATIONS
+section above for unsupported features. Report any unexpected behavior
+to the authors listed in the
 .B AUTHORS
 file.
 .SH SEE ALSO
