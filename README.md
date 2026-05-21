@@ -4,7 +4,7 @@ A simple UNIX command line interpreter written in C, replicating core behaviors 
 
 ## Description
 
-`hsh` reads commands from standard input, parses them, and executes them in a child process using `execve`. It supports executing programs by absolute path or by name via `PATH`, handles arguments, and implements the `exit` and `env` built-ins.
+`simple_shell` reads commands from standard input, splits them into tokens by whitespace (space, tab, newline), and executes them in a child process using `execve`. It supports executing programs by absolute/relative path or by name via the `PATH` environment variable, and implements the `exit` and `env` built-ins.
 
 ## Requirements
 
@@ -14,7 +14,7 @@ A simple UNIX command line interpreter written in C, replicating core behaviors 
 
 ## Compilation
 
-```
+```bash
 gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
 ```
 
@@ -25,9 +25,9 @@ gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
 ```
 $ ./hsh
 $ /bin/ls
-AUTHORS  README.md  hsh
+AUTHORS  README.md  env.c  executor.c  hsh  main.c  man_1_simple_shell  shell.h
 $ ls
-AUTHORS  README.md  hsh
+AUTHORS  README.md  env.c  executor.c  hsh  main.c  man_1_simple_shell  shell.h
 $ exit
 $
 ```
@@ -36,40 +36,40 @@ $
 
 ```
 $ echo "/bin/ls" | ./hsh
-AUTHORS  README.md  hsh
+AUTHORS  README.md  env.c  executor.c  hsh  main.c  man_1_simple_shell  shell.h
 ```
 
 ## Features
 
-| Feature           | Description                                              |
-| ----------------- | -------------------------------------------------------- |
-| Prompt            | Displays `$ ` and waits for input on each cycle          |
-| Command execution | Runs commands using `execve` after `fork`                |
-| Arguments         | Handles commands with up to 63 arguments                 |
-| `PATH` resolution | Searches every directory listed in `PATH`                |
-| Fork optimization | Does not `fork` if the command is not found              |
-| Error handling    | Prints proper error messages to `stderr`                 |
-| EOF handling      | Exits cleanly on `Ctrl+D`                                |
-| `exit` built-in   | Exits with the last command's status; arguments ignored  |
-| `env` built-in    | Prints the current environment                           |
+| Feature           | Description                                                           |
+| ----------------- | --------------------------------------------------------------------- |
+| Prompt            | Displays `$ ` in interactive mode (detected via `isatty`)             |
+| Command execution | Runs commands using `execve` after `fork`                             |
+| Arguments         | Supports commands with multiple arguments (token buffer of size 64)   |
+| `PATH` resolution | Searches each directory listed in `PATH` in order                     |
+| Fork optimization | Does not `fork` if the command is not found                           |
+| Error handling    | Prints error messages to `stderr`                                     |
+| EOF handling      | Exits cleanly on `Ctrl+D`                                             |
+| `exit` built-in   | Exits the shell with the last command's exit status                   |
+| `env` built-in    | Prints the current environment, one variable per line                 |
 
 ## File structure
 
-| File                 | Purpose                                          |
-| -------------------- | ------------------------------------------------ |
-| `shell.h`            | Header file with prototypes and includes         |
-| `main.c`             | Main read–parse–execute loop and prompt handling |
-| `executor.c`         | `fork`/`execve` logic and PATH resolution        |
-| `env.c`              | `env` built-in and environment helpers           |
-| `man_1_simple_shell` | Manual page (section 1)                          |
-| `AUTHORS`            | List of contributors                             |
+| File                 | Purpose                                                         |
+| -------------------- | --------------------------------------------------------------- |
+| `shell.h`            | Header with includes, `extern environ`, and function prototypes |
+| `main.c`             | Main read-parse-execute loop and built-in dispatch              |
+| `executor.c`         | Tokenizer, `PATH` resolution, `fork`/`execve` execution logic   |
+| `env.c`              | `env` built-in implementation                                   |
+| `man_1_simple_shell` | Manual page                                                     |
+| `AUTHORS`            | List of contributors                                            |
 
 ## Examples
 
 ```
 $ ./hsh
 $ /bin/pwd
-/home/user/simple_shell
+/home/user/holbertonschool-simple_shell
 $ env
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 HOME=/home/user
@@ -80,28 +80,32 @@ $ exit
 $
 ```
 
+## Exit status
+
+- Returns the exit status of the last executed command.
+- Returns `127` when a command is not found.
+- Returns `0` on `exit` or `Ctrl+D` if no earlier command failed.
+
 ## Limitations
 
-- Maximum of 63 arguments per command (fixed-size token array).
-- The `exit` built-in does not accept an exit code argument; it always exits with the status of the last executed command.
 - No support for pipes (`|`), redirections (`>`, `<`), or semicolons (`;`).
-- No support for variable expansion, quoting, or escape characters.
-- No support for command history or line editing.
-- No support for job control or background execution (`&`).
-- Aliases, functions, and shell scripts are not supported.
+- No variable expansion or quoting.
+- No command history or line editing.
+- No job control or background execution (`&`).
+- No aliases, functions, or shell scripts.
 
 ## Manual page
 
 After cloning, view the manual with:
 
-```
+```bash
 man ./man_1_simple_shell
 ```
 
 ## Authors
 
-- Abdulrahman Wadani — [@Abdulrahman-Wadani](https://github.com/Abdulrahman-Wadani)
-- Abdulrahman Asiri — [@abdularhman2341](https://github.com/abdularhman2341)
+- Abdulrahman Wadani
+- Abdulrahman Asiri
 
 ## License
 

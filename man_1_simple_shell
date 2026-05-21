@@ -1,4 +1,4 @@
-.TH HSH 1 "May 2026" "Simple Shell 1.0" "User Commands"
+.TH SIMPLE_SHELL 1 "May 2026" "Simple Shell 1.0" "User Commands"
 .SH NAME
 hsh \- a simple UNIX command line interpreter
 .SH SYNOPSIS
@@ -27,19 +27,18 @@ runs in non-interactive mode: it reads commands from the input stream,
 executes them silently, and exits when input is exhausted.
 .SH INVOCATION
 Commands are read one line at a time. Each line is split into tokens
-delimited by whitespace. The first token is the command; the remaining
-tokens are passed as arguments. Empty lines and lines containing only
-whitespace are ignored. A maximum of 64 tokens per line is supported
-(63 arguments plus the command itself).
+delimited by whitespace (space, tab, newline). The first token is the
+command; the remaining tokens are passed as arguments. Empty lines and
+lines containing only whitespace are ignored.
 .SH COMMAND EXECUTION
 If the command name contains a slash, it is treated as a path and executed
 directly.
 .PP
 Otherwise,
 .B hsh
-searches for the executable in each directory listed in the
+searches for the command in each directory listed in the
 .B PATH
-environment variable, in order. The first matching executable file is run.
+environment variable, in order. The first matching file is run.
 If no match is found, an error is printed and
 .BR fork (2)
 is not called.
@@ -53,7 +52,7 @@ The parent waits for the child to terminate before printing the prompt again.
 .TP
 .B exit
 Exits the shell with the exit status of the last executed command.
-Any arguments are silently ignored.
+Any arguments are ignored.
 .TP
 .B env
 Prints the current environment, one variable per line, in the form
@@ -64,7 +63,7 @@ inherits the environment from its parent process. The following variable
 affects its behavior:
 .TP
 .B PATH
-A colon-separated list of directories searched for executable commands.
+A colon-separated list of directories searched for commands.
 .SH EXIT STATUS
 .B hsh
 returns the exit status of the last executed command. If a command is not
@@ -72,8 +71,9 @@ found, the exit status is
 .BR 127 .
 On
 .B exit
-or end-of-file, the shell returns the exit status of the most recently
-executed command.
+or end-of-file, the shell returns
+.B 0
+unless an earlier command failed.
 .SH ERRORS
 If a command cannot be found,
 .B hsh
@@ -91,9 +91,9 @@ Interactive use:
 .nf
 $ ./hsh
 $ /bin/ls
-AUTHORS README.md hsh
+AUTHORS  README.md  env.c  executor.c  hsh  main.c  man_1_simple_shell  shell.h
 $ ls
-AUTHORS README.md hsh
+AUTHORS  README.md  env.c  executor.c  hsh  main.c  man_1_simple_shell  shell.h
 $ env
 PATH=/usr/local/bin:/usr/bin:/bin
 HOME=/home/user
@@ -107,17 +107,10 @@ Non-interactive use:
 .RS
 .nf
 $ echo "/bin/ls" | ./hsh
-AUTHORS README.md hsh
+AUTHORS  README.md  env.c  executor.c  hsh  main.c  man_1_simple_shell  shell.h
 .fi
 .RE
 .SH LIMITATIONS
-.IP \(bu 2
-A maximum of 63 arguments per command (fixed-size token array).
-.IP \(bu 2
-The
-.B exit
-built-in does not accept an exit code argument; it always exits with the
-status of the last executed command.
 .IP \(bu 2
 No support for pipes
 .RB ( | ),
@@ -135,11 +128,7 @@ No support for job control or background execution
 .IP \(bu 2
 Aliases, functions, and shell scripts are not supported.
 .SH BUGS
-This shell intentionally implements only a small subset of POSIX sh
-behavior. See the
-.B LIMITATIONS
-section above for unsupported features. Report any unexpected behavior
-to the authors listed in the
+None known at this time. Report issues to the authors listed in the
 .B AUTHORS
 file.
 .SH SEE ALSO
