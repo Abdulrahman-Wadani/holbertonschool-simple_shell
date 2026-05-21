@@ -29,7 +29,8 @@ executes them silently, and exits when input is exhausted.
 Commands are read one line at a time. Each line is split into tokens
 delimited by whitespace. The first token is the command; the remaining
 tokens are passed as arguments. Empty lines and lines containing only
-whitespace are ignored.
+whitespace are ignored. A maximum of 64 tokens per line is supported
+(63 arguments plus the command itself).
 .SH COMMAND EXECUTION
 If the command name contains a slash, it is treated as a path and executed
 directly.
@@ -51,7 +52,8 @@ The parent waits for the child to terminate before printing the prompt again.
 .SH BUILT-IN COMMANDS
 .TP
 .B exit
-Exits the shell. No arguments are accepted.
+Exits the shell with the exit status of the last executed command.
+Any arguments are silently ignored.
 .TP
 .B env
 Prints the current environment, one variable per line, in the form
@@ -70,9 +72,8 @@ found, the exit status is
 .BR 127 .
 On
 .B exit
-or end-of-file, the shell returns
-.B 0
-unless an earlier command failed.
+or end-of-file, the shell returns the exit status of the most recently
+executed command.
 .SH ERRORS
 If a command cannot be found,
 .B hsh
@@ -110,6 +111,13 @@ AUTHORS README.md hsh
 .fi
 .RE
 .SH LIMITATIONS
+.IP \(bu 2
+A maximum of 63 arguments per command (fixed-size token array).
+.IP \(bu 2
+The
+.B exit
+built-in does not accept an exit code argument; it always exits with the
+status of the last executed command.
 .IP \(bu 2
 No support for pipes
 .RB ( | ),

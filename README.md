@@ -41,17 +41,17 @@ AUTHORS  README.md  hsh
 
 ## Features
 
-| Feature           | Description                                     |
-| ----------------- | ----------------------------------------------- |
-| Prompt            | Displays `$ ` and waits for input on each cycle |
-| Command execution | Runs commands using `execve` after `fork`       |
-| Arguments         | Handles commands with any number of arguments   |
-| `PATH` resolution | Searches every directory listed in `PATH`       |
-| Fork optimization | Does not `fork` if the command is not found     |
-| Error handling    | Prints proper error messages to `stderr`        |
-| EOF handling      | Exits cleanly on `Ctrl+D`                       |
-| `exit` built-in   | Exits the shell                                 |
-| `env` built-in    | Prints the current environment                  |
+| Feature           | Description                                              |
+| ----------------- | -------------------------------------------------------- |
+| Prompt            | Displays `$ ` and waits for input on each cycle          |
+| Command execution | Runs commands using `execve` after `fork`                |
+| Arguments         | Handles commands with up to 63 arguments                 |
+| `PATH` resolution | Searches every directory listed in `PATH`                |
+| Fork optimization | Does not `fork` if the command is not found              |
+| Error handling    | Prints proper error messages to `stderr`                 |
+| EOF handling      | Exits cleanly on `Ctrl+D`                                |
+| `exit` built-in   | Exits with the last command's status; arguments ignored  |
+| `env` built-in    | Prints the current environment                           |
 
 ## File structure
 
@@ -79,6 +79,16 @@ $ nonexistent_command
 $ exit
 $
 ```
+
+## Limitations
+
+- Maximum of 63 arguments per command (fixed-size token array).
+- The `exit` built-in does not accept an exit code argument; it always exits with the status of the last executed command.
+- No support for pipes (`|`), redirections (`>`, `<`), or semicolons (`;`).
+- No support for variable expansion, quoting, or escape characters.
+- No support for command history or line editing.
+- No support for job control or background execution (`&`).
+- Aliases, functions, and shell scripts are not supported.
 
 ## Manual page
 
